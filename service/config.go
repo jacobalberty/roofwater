@@ -18,4 +18,6 @@ type WeatherConfig struct {
 	Zip           string        `envconfig:"ZIP" required:"true" desc:"Zip code to get weather for"`
 	Country       string        `envconfig:"COUNTRY" required:"true" desc:"Country to get weather for"`
 	CacheDuration time.Duration `envconfig:"CACHE_DURATION" default:"1h" desc:"Duration to cache weather data"`
+	Unit          string        `envconfig:"UNIT" default:"F" desc:"Unit to use for weather data"`
+	Language      string        `envconfig:"LANGUAGE" default:"EN" desc:"Language to use for weather data"`
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	owm "github.com/briandowns/openweathermap"
@@ -33,7 +34,13 @@ func NewExpiringWeather(cfg Config) (*ExpiringWeather, error) {
 		err error
 		w   *owm.CurrentWeatherData
 	)
-	w, err = owm.NewCurrent("F", "EN", cfg.Weather.APIKey)
+
+	w, err = owm.NewCurrent(
+		strings.ToUpper(cfg.Weather.Unit),
+		strings.ToUpper(cfg.Weather.Language),
+		cfg.Weather.APIKey,
+	)
+
 	if err != nil {
 		return nil, err
 	}
