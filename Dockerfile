@@ -18,3 +18,5 @@ COPY --from=build --chown=nonroot:nonroot /src/output /
 USER nonroot:nonroot
 
 ENTRYPOINT ["/roofwaterd"]
+
+CMD ["-d"]

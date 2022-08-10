@@ -7,13 +7,16 @@ import (
 
 var Logger *otelzap.Logger
 
-func InitializeLogger() {
+func InitializeLogger(daemon bool) {
 	var (
 		log *zap.Logger
 		err error
 	)
-
-	log, err = zap.NewProduction()
+	if daemon {
+		log, err = zap.NewProduction()
+	} else {
+		log, err = zap.NewDevelopment()
+	}
 	if err != nil {
 		panic(err)
 	}

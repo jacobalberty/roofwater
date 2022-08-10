@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
+	"flag"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,25 +19,34 @@ import (
 
 func main() {
 	var (
-		err error
-		cfg service.Config
-		c   = make(chan os.Signal, 1)
-		w   *service.ExpiringWeather
+		err    error
+		cfg    service.Config
+		c      = make(chan os.Signal, 1)
+		w      *service.ExpiringWeather
+		daemon bool
 	)
-	utils.InitializeLogger()
+
+	flag.BoolVar(&daemon, "d", false, "Run as a daemon")
+
+	flag.Parse()
+
+	utils.InitializeLogger(daemon)
 
 	defer func() {
 		err := utils.Logger.Sync()
-		if err != nil {
-			panic(err)
+		if err != nil && !errors.Is(err, syscall.ENOTTY) && !errors.Is(err, syscall.EINVAL) {
+			log.Println("error syncing logs", err)
 		}
 	}()
 
-	utils.Logger.Info("Roof Water started")
-
-	err = envconfig.Process("roofwaterd", &cfg)
+	err = envconfig.Process("RW", &cfg)
 	if err != nil {
-		utils.Logger.Fatal("Failed to process config", zap.Error(err))
+		if daemon {
+			utils.Logger.Fatal("Failed to process config", zap.Error(err))
+		} else {
+			envconfig.Usage("RW", &cfg)
+		}
+		os.Exit(1)
 	}
 
 	if err = owm.ValidAPIKey(cfg.Weather.APIKey); err != nil {
@@ -48,29 +60,37 @@ func main() {
 		utils.Logger.Fatal("Failed to create weather client", zap.Error(err))
 	}
 
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	if daemon {
+		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
-	go func() {
-		var (
-			err error
-			t   float64
-		)
+		go func() {
+			utils.Logger.Info("Roof water loop successfully started")
 
-		for {
-			ctx := context.Background()
-			t, err = w.CurrentTempByZip(ctx)
-			if err != nil {
-				utils.Logger.Ctx(ctx).Error("Failed to get weather", zap.Error(err))
+			for {
+				checkWeatherAndCool(context.Background(), w, cfg)
+				time.Sleep(cfg.PulseInterval)
 			}
-			if t > cfg.MinTemp {
+		}()
 
-				utils.Logger.Ctx(ctx).Info("Temperature is too high", zap.Float64("temp", t))
-				service.Valve{IP: cfg.Valve}.RWPulse(ctx, cfg.PulseWidth)
-			}
-			time.Sleep(cfg.PulseInterval)
-		}
-	}()
+		<-c
+		utils.Logger.Info("Received interrupt, exiting")
+	} else {
+		checkWeatherAndCool(context.Background(), w, cfg)
+	}
+}
 
-	<-c
-	utils.Logger.Info("Received interrupt, exiting")
+func checkWeatherAndCool(ctx context.Context, w *service.ExpiringWeather, cfg service.Config) {
+	var (
+		err error
+		t   float64
+	)
+
+	t, err = w.CurrentTempByZip(ctx)
+	if err != nil {
+		utils.Logger.Ctx(ctx).Error("Failed to get weather", zap.Error(err))
+	}
+	if t > cfg.MinTemp {
+		utils.Logger.Ctx(ctx).Info("Temperature is too high", zap.Float64("temp", t))
+		service.Valve{IP: cfg.Valve}.RWPulse(ctx, cfg.PulseWidth)
+	}
 }
