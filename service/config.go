@@ -15,7 +15,7 @@ type Config struct {
 
 type WeatherConfig struct {
 	APIKey        string        `envconfig:"RW_OWM_API_KEY" required:"true"`
-	Zip           int           `envconfig:"RW_OWM_ZIP" required:"true"`
+	Zip           string        `envconfig:"RW_OWM_ZIP" required:"true"`
 	Country       string        `envconfig:"RW_OWM_COUNTRY" required:"true"`
 	CacheDuration time.Duration `envconfig:"RW_OWM_CACHE_DURATION" default:"1h"`
 }

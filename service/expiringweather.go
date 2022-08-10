@@ -17,7 +17,7 @@ func (e *ExpiringWeather) CurrentTempByZip() (float64, error) {
 	var err error
 	if time.Since(e.lastUpdate) > e.cfg.Weather.CacheDuration {
 		utils.Logger.Info("Updating weather cache")
-		err = e.w.CurrentByZip(e.cfg.Weather.Zip, e.cfg.Weather.Country)
+		err = e.w.CurrentByZipcode(e.cfg.Weather.Zip, e.cfg.Weather.Country)
 		e.lastUpdate = time.Now()
 	}
 	return e.w.Main.FeelsLike, err

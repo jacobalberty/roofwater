@@ -22,7 +22,12 @@ func main() {
 	)
 	utils.InitializeLogger()
 
-	defer utils.Logger.Sync() // flushes buffer, if any
+	defer func() {
+		err := utils.Logger.Sync()
+		if err != nil {
+			panic(err)
+		}
+	}()
 
 	utils.Logger.Info("Roof Water started")
 

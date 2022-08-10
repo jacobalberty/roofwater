@@ -20,7 +20,20 @@ func (v Valve) RWPulse(d time.Duration) {
 		zap.Duration("duration", d),
 	)
 
-	http.Get(fmt.Sprintf("http://%s/cm?cmnd=Power%%20On", v.IP.String()))
-	defer http.Get(fmt.Sprintf("http://%s/cm?cmnd=Power%%20Off", v.IP.String()))
+	_, err := http.Get(fmt.Sprintf("http://%s/cm?cmnd=Power%%20On", v.IP.String()))
+	if err != nil {
+		utils.Logger.Error("Failed to pulse valve",
+			zap.Error(err),
+		)
+		return
+	}
+	defer func() {
+		_, err := http.Get(fmt.Sprintf("http://%s/cm?cmnd=Power%%20Off", v.IP.String()))
+		if err != nil {
+			utils.Logger.Error("Failed to turn off valve",
+				zap.Error(err),
+			)
+		}
+	}()
 	time.Sleep(d)
 }
