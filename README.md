@@ -9,12 +9,13 @@ This application is configured via the environment. The following environment
 variables can be used:
 
 KEY                      TYPE        DEFAULT    REQUIRED    DESCRIPTION
-RW_VALVE_IP              String                 true
-RW_PULSEWIDTH            Duration    15s
-RW_PULSEINTERVAL         Duration    5m
-RW_MINTEMP               Float       90
-RW_OWM_API_KEY           String                 true
-RW_OWM_ZIP               String                 true
-RW_OWM_COUNTRY           String                 true
-RW_OWM_CACHE_DURATION    Duration    1h
+RW_VALVE_IP              String                 true        IP address of the valve
+RW_PULSEWIDTH            Duration    15s                    Duration of the time to turn valve on
+RW_PULSEINTERVAL         Duration    5m                     Interval between pulses
+RW_MINTEMP               Float       90                     Minimum temperature to run the valve
+RW_OWM_API_KEY           String                 true        OpenWeatherMap API key
+RW_OWM_ZIP               String                 true        Zip code to get weather for
+RW_OWM_COUNTRY           String                 true        Country to get weather for
+RW_OWM_CACHE_DURATION    Duration    1h                     Duration to cache weather data
+
 ```
