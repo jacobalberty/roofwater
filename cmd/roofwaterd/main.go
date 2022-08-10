@@ -44,7 +44,10 @@ func main() {
 		if daemon {
 			utils.Logger.Fatal("Failed to process config", zap.Error(err))
 		} else {
-			envconfig.Usage("RW", &cfg)
+			err = envconfig.Usage("RW", &cfg)
+			if err != nil {
+				utils.Logger.Fatal("Failed to print config usage", zap.Error(err))
+			}
 		}
 		os.Exit(1)
 	}
