@@ -1,16 +1,22 @@
 package utils
 
-import "go.uber.org/zap"
+import (
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
+	"go.uber.org/zap"
+)
 
-var Logger *zap.Logger
+var Logger *otelzap.Logger
 
 func InitializeLogger() {
 	var (
+		log *zap.Logger
 		err error
 	)
 
-	Logger, err = zap.NewProduction()
+	log, err = zap.NewProduction()
 	if err != nil {
 		panic(err)
 	}
+
+	Logger = otelzap.New(log)
 }

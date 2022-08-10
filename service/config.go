@@ -9,7 +9,7 @@ type Config struct {
 	Valve         net.IP        `envconfig:"RW_VALVE_IP" required:"true"`
 	PulseWidth    time.Duration `envconfig:"RW_PULSEWIDTH" default:"15s"`
 	PulseInterval time.Duration `envconfig:"RW_PULSEINTERVAL" default:"5m"`
-	MinTemp       float64       `envconfig:"RW_MINTEMP" default:"90"`
+	MinTemp       float64       `envconfig:"RW_MINTEMP" default:"80"`
 	Weather       WeatherConfig
 }
 

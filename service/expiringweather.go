@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"time"
 
 	owm "github.com/briandowns/openweathermap"
@@ -13,10 +14,10 @@ type ExpiringWeather struct {
 	lastUpdate time.Time
 }
 
-func (e *ExpiringWeather) CurrentTempByZip() (float64, error) {
+func (e *ExpiringWeather) CurrentTempByZip(ctx context.Context) (float64, error) {
 	var err error
 	if time.Since(e.lastUpdate) > e.cfg.Weather.CacheDuration {
-		utils.Logger.Info("Updating weather cache")
+		utils.Logger.Ctx(ctx).Info("Updating weather cache")
 		err = e.w.CurrentByZipcode(e.cfg.Weather.Zip, e.cfg.Weather.Country)
 		e.lastUpdate = time.Now()
 	}

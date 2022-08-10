@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/signal"
 	"syscall"
@@ -56,13 +57,15 @@ func main() {
 		)
 
 		for {
-			t, err = w.CurrentTempByZip()
+			ctx := context.Background()
+			t, err = w.CurrentTempByZip(ctx)
 			if err != nil {
-				utils.Logger.Error("Failed to get weather", zap.Error(err))
+				utils.Logger.Ctx(ctx).Error("Failed to get weather", zap.Error(err))
 			}
 			if t > cfg.MinTemp {
-				utils.Logger.Info("Temperature is too high", zap.Float64("temp", t))
-				service.Valve{IP: cfg.Valve}.RWPulse(cfg.PulseWidth)
+
+				utils.Logger.Ctx(ctx).Info("Temperature is too high", zap.Float64("temp", t))
+				service.Valve{IP: cfg.Valve}.RWPulse(ctx, cfg.PulseWidth)
 			}
 			time.Sleep(cfg.PulseInterval)
 		}
