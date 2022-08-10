@@ -17,7 +17,7 @@ func main() {
 	var (
 		err error
 		cfg service.Config
-		c   = make(chan os.Signal)
+		c   = make(chan os.Signal, 1)
 		w   *service.ExpiringWeather
 	)
 	utils.InitializeLogger()
