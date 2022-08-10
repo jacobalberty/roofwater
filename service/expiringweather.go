@@ -6,6 +6,7 @@ import (
 
 	owm "github.com/briandowns/openweathermap"
 	"github.com/jacobalberty/roofwater/service/utils"
+	"go.uber.org/zap"
 )
 
 type ExpiringWeather struct {
@@ -17,8 +18,11 @@ type ExpiringWeather struct {
 func (e *ExpiringWeather) CurrentTempByZip(ctx context.Context) (float64, error) {
 	var err error
 	if time.Since(e.lastUpdate) > e.cfg.Weather.CacheDuration {
-		utils.Logger.Ctx(ctx).Info("Updating weather cache")
 		err = e.w.CurrentByZipcode(e.cfg.Weather.Zip, e.cfg.Weather.Country)
+		utils.Logger.Ctx(ctx).Info("Updated weather cache",
+			zap.Float64("current.feels_like", e.w.Main.FeelsLike),
+			zap.Float64("current.temp", e.w.Main.Temp),
+		)
 		e.lastUpdate = time.Now()
 	}
 	return e.w.Main.FeelsLike, err
