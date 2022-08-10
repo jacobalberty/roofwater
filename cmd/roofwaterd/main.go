@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -27,6 +28,15 @@ func main() {
 	)
 
 	flag.BoolVar(&daemon, "d", false, "Run as a daemon")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [options]\n", os.Args[0])
+		flag.PrintDefaults()
+		fmt.Fprint(os.Stderr, "\n")
+		err = envconfig.Usage("RW", &cfg)
+		if err != nil {
+			utils.Logger.Fatal("Failed to print config usage", zap.Error(err))
+		}
+	}
 
 	flag.Parse()
 
