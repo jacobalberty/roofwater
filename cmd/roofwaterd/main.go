@@ -15,6 +15,8 @@ import (
 	"github.com/jacobalberty/roofwater/service"
 	"github.com/jacobalberty/roofwater/service/utils"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/uptrace/opentelemetry-go-extra/otelplay"
+	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 )
 
@@ -74,6 +76,15 @@ func main() {
 	}
 
 	if daemon {
+		ctx := context.Background()
+		shutdown := otelplay.ConfigureOpentelemetry(ctx)
+		defer shutdown()
+
+		tracer := otel.Tracer(cfg.Tracing.ServiceName)
+
+		ctx, span := tracer.Start(ctx, "root")
+		defer span.End()
+
 		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 		go func() {
