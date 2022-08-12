@@ -91,7 +91,7 @@ func main() {
 			utils.Logger.Info("Roof water loop successfully started")
 
 			for {
-				checkWeatherAndCool(context.Background(), w, cfg)
+				checkWeatherAndCool(ctx, w, cfg)
 				time.Sleep(cfg.PulseInterval)
 			}
 		}()
