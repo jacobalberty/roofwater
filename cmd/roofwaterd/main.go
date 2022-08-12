@@ -82,7 +82,7 @@ func main() {
 
 		tracer := otel.Tracer(cfg.Tracing.ServiceName)
 
-		ctx, span := tracer.Start(ctx, "root")
+		_, span := tracer.Start(ctx, "root")
 		defer span.End()
 
 		signal.Notify(c, os.Interrupt, syscall.SIGTERM)

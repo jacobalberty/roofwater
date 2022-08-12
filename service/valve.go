@@ -2,9 +2,7 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"net"
-	"net/http"
 	"time"
 
 	"github.com/jacobalberty/roofwater/service/utils"
@@ -20,21 +18,22 @@ func (v Valve) RWPulse(ctx context.Context, d time.Duration) {
 		zap.String("ip", v.IP.String()),
 		zap.Duration("duration", d),
 	)
-
-	_, err := http.Get(fmt.Sprintf("http://%s/cm?cmnd=Power%%20On", v.IP.String()))
-	if err != nil {
-		utils.Logger.Ctx(ctx).Error("Failed to pulse valve",
-			zap.Error(err),
-		)
-		return
-	}
-	defer func() {
-		_, err := http.Get(fmt.Sprintf("http://%s/cm?cmnd=Power%%20Off", v.IP.String()))
+	/*
+		_, err := http.Get(fmt.Sprintf("http://%s/cm?cmnd=Power%%20On", v.IP.String()))
 		if err != nil {
-			utils.Logger.Ctx(ctx).Error("Failed to turn off valve",
+			utils.Logger.Ctx(ctx).Error("Failed to pulse valve",
 				zap.Error(err),
 			)
+			return
 		}
-	}()
+		defer func() {
+			_, err := http.Get(fmt.Sprintf("http://%s/cm?cmnd=Power%%20Off", v.IP.String()))
+			if err != nil {
+				utils.Logger.Ctx(ctx).Error("Failed to turn off valve",
+					zap.Error(err),
+				)
+			}
+		}()
+	*/
 	time.Sleep(d)
 }
