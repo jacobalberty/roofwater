@@ -18,6 +18,10 @@ type ExpiringWeather struct {
 
 func (e *ExpiringWeather) CurrentTempByZip(ctx context.Context) (float64, error) {
 	var err error
+
+	ctx, span := utils.Tracer.Start(ctx, "CurrentTempByZip")
+	defer span.End()
+
 	if time.Since(e.lastUpdate) > e.cfg.Weather.CacheDuration {
 		err = e.w.CurrentByZipcode(e.cfg.Weather.Zip, e.cfg.Weather.Country)
 		utils.Logger.Ctx(ctx).Info("Updated weather cache",

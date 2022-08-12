@@ -15,8 +15,6 @@ import (
 	"github.com/jacobalberty/roofwater/service"
 	"github.com/jacobalberty/roofwater/service/utils"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/uptrace/opentelemetry-go-extra/otelplay"
-	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 )
 
@@ -77,30 +75,17 @@ func main() {
 
 	if daemon {
 		ctx := context.Background()
-		shutdown := otelplay.ConfigureOpentelemetry(ctx)
+		shutdown := utils.InitializeTracer(ctx, cfg.Tracing)
 		defer shutdown()
-
-		tracer := otel.Tracer(cfg.Tracing.ServiceName)
-
-		_, span := tracer.Start(ctx, "root")
-		defer span.End()
 
 		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 		go func() {
-			var (
-				ctx    = context.Background()
-				tracer = otel.Tracer(cfg.Tracing.ServiceName)
-			)
-
-			ctx, span := tracer.Start(ctx, "root")
-			defer span.End()
+			var ()
 			utils.Logger.Info("Roof water loop successfully started")
 
 			for {
 				func() {
-					ctx, span := tracer.Start(ctx, "checkWeatherAndCool")
-					defer span.End()
 					checkWeatherAndCool(ctx, w, cfg)
 					time.Sleep(cfg.PulseInterval)
 				}()
@@ -119,6 +104,9 @@ func checkWeatherAndCool(ctx context.Context, w *service.ExpiringWeather, cfg se
 		err error
 		t   float64
 	)
+
+	ctx, span := utils.Tracer.Start(ctx, "checkWeatherAndCool")
+	defer span.End()
 
 	t, err = w.CurrentTempByZip(ctx)
 	if err != nil {
