@@ -2,6 +2,7 @@ package tasmota
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -14,6 +15,8 @@ type ClientType int
 const (
 	ClientTypeWeb ClientType = iota
 	ClientTypeMQTT
+	ClientTypeSerial
+	ClientTypeTest
 )
 
 type PowerState int
@@ -29,8 +32,15 @@ var (
 )
 
 type Client struct {
-	Type ClientType
-	IP   net.IP
+	Type    ClientType
+	IP      net.IP
+	NoDelay bool
+}
+
+func (t Client) Command() Command {
+	return Command{
+		Client: t,
+	}
 }
 
 func (t Client) Execute(c Command) error {
@@ -44,10 +54,14 @@ func (t Client) Execute(c Command) error {
 	}
 	switch t.Type {
 	case ClientTypeWeb:
-		_, err := http.Get(fmt.Sprintf("http://%s/cm?cmnd=%s", t.IP.String(), cmd))
+		_, err := http.Get(fmt.Sprintf("http://%s/cm?cmnd=%s", t.IP.String(), url.QueryEscape(cmd)))
 		return err
+	case ClientTypeTest:
+		log.Println(cmd)
+		return nil
+	default:
+		return ErrUnsupportedClientType
 	}
-	return nil
 }
 
 func (t Client) Build(c Command) (string, error) {
@@ -56,21 +70,21 @@ func (t Client) Build(c Command) (string, error) {
 		prefix string
 	)
 	if len(c.commands) > 0 {
-		prefix = "backlog "
+		if c.NoDelay {
+			prefix = "backlog0 "
+		} else {
+			prefix = "backlog "
+		}
 	}
 	for _, cmd := range c.commands {
 		res = append(res, fmt.Sprintf("%s %s\n", cmd[0], cmd[1]))
 	}
-	switch t.Type {
-	case ClientTypeWeb:
-		return url.QueryEscape(prefix + strings.Join(res, ";")), nil
-	case ClientTypeMQTT:
-		return prefix + strings.Join(res, ";"), nil
-	}
-	return "", ErrUnsupportedClientType
+
+	return prefix + strings.Join(res, ";"), nil
 }
 
 type Command struct {
+	Client
 	commands [][]string
 }
 
