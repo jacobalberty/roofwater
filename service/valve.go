@@ -26,8 +26,8 @@ func (v Valve) RWPulse(ctx context.Context, d time.Duration) {
 		Type: tasmota.ClientTypeWeb,
 		IP:   v.IP,
 	}
-	tCommand := tasmota.Command{}.Power(tasmota.PowerOn).Delay(d).Power(tasmota.PowerOff)
-	err := tClient.Execute(tCommand)
+	tCommand := tClient.Command().Power(tasmota.PowerOn).Delay(d).Power(tasmota.PowerOff)
+	err := tCommand.Execute(tCommand)
 	if err != nil {
 		span.SetStatus(codes.Error, "RWPulse failed")
 		span.RecordError(err)
