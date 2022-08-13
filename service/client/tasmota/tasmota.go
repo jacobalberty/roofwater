@@ -66,7 +66,7 @@ func (t Client) Execute(c Command) error {
 
 func (t Client) Build(c Command) (string, error) {
 	var (
-		res    = make([]string, len(c.commands))
+		res    = make([]string, 0, len(c.commands))
 		prefix string
 	)
 	if len(c.commands) > 0 {
@@ -77,7 +77,7 @@ func (t Client) Build(c Command) (string, error) {
 		}
 	}
 	for _, cmd := range c.commands {
-		res = append(res, fmt.Sprintf("%s %s\n", cmd[0], cmd[1]))
+		res = append(res, fmt.Sprintf("%s %s", cmd[0], cmd[1]))
 	}
 
 	return prefix + strings.Join(res, ";"), nil
