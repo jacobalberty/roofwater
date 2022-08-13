@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"io"
 	"os"
 	"os/user"
 
@@ -34,9 +35,10 @@ func newExporter(ctx context.Context, tc TracerConfig) (sdktrace.SpanExporter, e
 	switch {
 	case os.Getenv("OTEL_EXPORTER_JAEGER_ENDPOINT") != "":
 		return jaeger.New(jaeger.WithCollectorEndpoint())
+	case os.Getenv("OTEL_EXPORTER_DISCARD_ENABLED") != "":
+		return stdouttrace.New(stdouttrace.WithWriter(io.Discard))
 	default:
 		return stdouttrace.New(stdouttrace.WithPrettyPrint())
-
 	}
 }
 
