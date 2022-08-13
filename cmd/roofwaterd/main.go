@@ -87,7 +87,7 @@ func main() {
 			for {
 				func() {
 					checkWeatherAndCool(ctx, w, cfg)
-					time.Sleep(cfg.PulseInterval)
+					time.Sleep(cfg.PulseInterval + cfg.PulseWidth)
 				}()
 			}
 		}()
