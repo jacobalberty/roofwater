@@ -13,6 +13,10 @@ import (
 	"github.com/eclipse/paho.golang/paho"
 )
 
+const (
+	MAX_COMMAND_LENGTH = 30
+)
+
 type ClientType int
 
 const (
@@ -33,6 +37,7 @@ const (
 var (
 	ErrUnsupportedClientType = fmt.Errorf("unsupported client type")
 	ErrNoSubscribers         = fmt.Errorf("no subscribers")
+	ErrTooMany               = fmt.Errorf("too many commands")
 )
 
 type Client struct {
@@ -134,6 +139,11 @@ func (t Client) Build(c Command) (string, error) {
 			prefix = "backlog "
 		}
 	}
+
+	if len(c.commands) > MAX_COMMAND_LENGTH {
+		return "", ErrTooMany
+	}
+
 	for _, cmd := range c.commands {
 		res = append(res, fmt.Sprintf("%s %s", cmd[0], cmd[1]))
 	}
