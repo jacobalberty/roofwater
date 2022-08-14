@@ -53,6 +53,7 @@ type MQTTConfig struct {
 	Topic     string
 	Username  string
 	Password  []byte
+	ClientID  string
 }
 
 func (t *Client) init(ctx context.Context) error {
@@ -67,6 +68,9 @@ func (t *Client) init(ctx context.Context) error {
 		}
 		cliCfg := autopaho.ClientConfig{
 			BrokerUrls: []*url.URL{u},
+			ClientConfig: paho.ClientConfig{
+				ClientID: t.MQTTConfig.ClientID,
+			},
 		}
 		cliCfg.SetUsernamePassword(t.MQTTConfig.Username, t.MQTTConfig.Password)
 		t.cm, err = autopaho.NewConnection(ctx, cliCfg)
@@ -92,24 +96,40 @@ func (t Client) Execute(ctx context.Context, c Command) error {
 		return err
 	}
 
-	cmd, err = t.Build(c)
-	if err != nil {
-		return err
-	}
-
 	switch t.Type {
 	case ClientTypeWeb:
+		cmd, err = t.Build(c)
+		if err != nil {
+			return err
+		}
 		_, err = http.Get(fmt.Sprintf("http://%s/cm?cmnd=%s", t.Addr, url.QueryEscape(cmd)))
 		return err
 	case ClientTypeMQTT:
+		var payload string
+
 		err = t.cm.AwaitConnection(ctx)
 		if err != nil {
 			return err
 		}
+		if len(c.commands) > 1 {
+			payload, err = t.Build(c)
+			if err != nil {
+				return err
+			}
+			if t.NoDelay {
+				cmd = "backlog0"
+			} else {
+				cmd = "backlog"
+			}
+		} else if len(c.commands) == 1 {
+			cmd = c.commands[0][0]
+			payload = c.commands[0][1]
+		}
 
 		pr, err = t.cm.Publish(ctx, &paho.Publish{
-			Topic:   t.MQTTConfig.Topic,
-			Payload: []byte(cmd),
+			QoS:     2,
+			Topic:   fmt.Sprintf("cmnd/%s/%s", t.MQTTConfig.Topic, cmd),
+			Payload: []byte(payload),
 		})
 		if err != nil {
 			return err
@@ -131,14 +151,8 @@ func (t Client) Build(c Command) (string, error) {
 	var (
 		res    = make([]string, 0, len(c.commands))
 		prefix string
+		cmd    string
 	)
-	if len(c.commands) > 0 {
-		if c.NoDelay {
-			prefix = "backlog0 "
-		} else {
-			prefix = "backlog "
-		}
-	}
 
 	if len(c.commands) > MAX_COMMAND_LENGTH {
 		return "", ErrTooMany
@@ -148,7 +162,26 @@ func (t Client) Build(c Command) (string, error) {
 		res = append(res, fmt.Sprintf("%s %s", cmd[0], cmd[1]))
 	}
 
-	return prefix + strings.Join(res, ";"), nil
+	cmd = strings.Join(res, ";")
+
+	switch t.Type {
+	case ClientTypeWeb:
+		if len(c.commands) > 0 {
+			if c.NoDelay {
+				prefix = "backlog0 "
+			} else {
+				prefix = "backlog "
+			}
+		}
+
+		return prefix + cmd, nil
+	case ClientTypeTest:
+		fallthrough
+	case ClientTypeMQTT:
+		return cmd, nil
+	default:
+		return "", ErrUnsupportedClientType
+	}
 }
 
 type Command struct {
