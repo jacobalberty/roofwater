@@ -113,7 +113,16 @@ func checkWeatherAndCool(ctx context.Context, w *service.ExpiringWeather, cfg se
 		utils.Logger.Ctx(ctx).Error("Failed to get weather", zap.Error(err))
 	}
 	if t > cfg.MinTemp {
+		var valve service.Valve
+		if cfg.MQTTConfig.URL != "" {
+			valve = service.Valve{
+				Addr:       cfg.ValveConfig.Topic,
+				MQTTConfig: &cfg.MQTTConfig,
+			}
+		} else {
+			valve = service.Valve{Addr: cfg.ValveConfig.Addr}
+		}
 		utils.Logger.Ctx(ctx).Info("Temperature is too high", zap.Float64("temp", t))
-		service.Valve{Addr: cfg.ValveConfig.Addr}.RWPulse(ctx, cfg.PulseWidth)
+		valve.RWPulse(ctx, cfg.PulseWidth)
 	}
 }

@@ -20,5 +20,9 @@ RW_OWM_UNIT                String      F                         Unit to use for
 RW_OWM_LANGUAGE            String      EN                        Language to use for weather data
 RW_TRACING_SERVICE_NAME    String      roofwaterd                Service name to use for tracing
 RW_VALVE_HTTP_ADDR         String                                HTTP Address of the valve
+RW_VALVE_MQTT_TOPIC        String                                MQTT topic to publish to
+RW_MQTT_URL                String                                MQTT Broker URL
+RW_MQTT_USER               String                                MQTT username
+RW_MQTT_PASS               String                                MQTT password
 
 ```

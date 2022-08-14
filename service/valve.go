@@ -11,19 +11,37 @@ import (
 )
 
 type Valve struct {
-	Addr string
+	Addr       string
+	MQTTConfig *MQTTConfig
 }
 
 func (v Valve) RWPulse(ctx context.Context, d time.Duration) {
+	var (
+		tClient *tasmota.Client
+	)
+
 	ctx, span := utils.Tracer.Start(ctx, "RWPulse")
 	defer span.End()
 	utils.Logger.Ctx(ctx).Info("Pulsing valve",
 		zap.String("addr", v.Addr),
 		zap.Duration("duration", d),
 	)
-	tClient := tasmota.Client{
-		Type: tasmota.ClientTypeWeb,
-		Addr: v.Addr,
+	if v.MQTTConfig == nil {
+		tClient = &tasmota.Client{
+			Type: tasmota.ClientTypeWeb,
+			Addr: v.Addr,
+		}
+	} else {
+		tClient = &tasmota.Client{
+			Type: tasmota.ClientTypeMQTT,
+			MQTTConfig: tasmota.MQTTConfig{
+				BrokerUrl: v.MQTTConfig.URL,
+				Topic:     v.Addr,
+				Username:  v.MQTTConfig.User,
+				Password:  []byte(v.MQTTConfig.Pass),
+				ClientID:  "roofwater",
+			},
+		}
 	}
 	tCommand := tClient.Command().Power(tasmota.PowerOn).Delay(d).Power(tasmota.PowerOff)
 	err := tCommand.Execute(ctx, tCommand)

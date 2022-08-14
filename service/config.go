@@ -13,6 +13,7 @@ type Config struct {
 	Weather       WeatherConfig      `envconfig:"OWM" required:"true" desc:"OpenWeatherMap configuration"`
 	Tracing       utils.TracerConfig `envconfig:"TRACING" required:"true" desc:"Tracing configuration"`
 	ValveConfig   ValveConfig        `envconfig:"VALVE" required:"true" desc:"Valve configuration"`
+	MQTTConfig    MQTTConfig         `envconfig:"MQTT" required:"true" desc:"MQTT configuration"`
 }
 
 type WeatherConfig struct {
@@ -25,5 +26,12 @@ type WeatherConfig struct {
 }
 
 type ValveConfig struct {
-	Addr string `envconfig:"HTTP_ADDR" desc:"HTTP Address of the valve"`
+	Addr  string `envconfig:"HTTP_ADDR" desc:"HTTP Address of the valve"`
+	Topic string `envconfig:"MQTT_TOPIC" desc:"MQTT topic to publish to"`
+}
+
+type MQTTConfig struct {
+	URL  string `envconfig:"URL" desc:"MQTT Broker URL"`
+	User string `envconfig:"USER" desc:"MQTT username"`
+	Pass string `envconfig:"PASS" desc:"MQTT password"`
 }
