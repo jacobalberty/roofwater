@@ -16,13 +16,7 @@ type Valve struct {
 	tClient    *tasmota.Client
 }
 
-func (v *Valve) RWPulse(ctx context.Context, d time.Duration) {
-	ctx, span := utils.Tracer.Start(ctx, "RWPulse")
-	defer span.End()
-	utils.Logger.Ctx(ctx).Info("Pulsing valve",
-		zap.String("addr", v.Addr),
-		zap.Duration("duration", d),
-	)
+func (v *Valve) init() {
 	if v.tClient == nil {
 		if v.MQTTConfig == nil {
 			v.tClient = &tasmota.Client{
@@ -45,6 +39,18 @@ func (v *Valve) RWPulse(ctx context.Context, d time.Duration) {
 			}
 		}
 	}
+}
+
+func (v *Valve) RWPulse(ctx context.Context, d time.Duration) {
+	ctx, span := utils.Tracer.Start(ctx, "RWPulse")
+	defer span.End()
+	utils.Logger.Ctx(ctx).Info("Pulsing valve",
+		zap.String("addr", v.Addr),
+		zap.Duration("duration", d),
+	)
+
+	v.init()
+
 	tCommand := v.tClient.Command().Power(tasmota.PowerOn).Delay(d).Power(tasmota.PowerOff)
 	err := tCommand.Execute(ctx, tCommand)
 	if err != nil {
