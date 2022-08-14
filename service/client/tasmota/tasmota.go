@@ -3,7 +3,6 @@ package tasmota
 import (
 	"fmt"
 	"log"
-	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -33,7 +32,7 @@ var (
 
 type Client struct {
 	Type    ClientType
-	IP      net.IP
+	Addr    string
 	NoDelay bool
 }
 
@@ -54,7 +53,7 @@ func (t Client) Execute(c Command) error {
 	}
 	switch t.Type {
 	case ClientTypeWeb:
-		_, err := http.Get(fmt.Sprintf("http://%s/cm?cmnd=%s", t.IP.String(), url.QueryEscape(cmd)))
+		_, err := http.Get(fmt.Sprintf("http://%s/cm?cmnd=%s", t.Addr, url.QueryEscape(cmd)))
 		return err
 	case ClientTypeTest:
 		log.Println(cmd)

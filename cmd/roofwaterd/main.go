@@ -114,6 +114,6 @@ func checkWeatherAndCool(ctx context.Context, w *service.ExpiringWeather, cfg se
 	}
 	if t > cfg.MinTemp {
 		utils.Logger.Ctx(ctx).Info("Temperature is too high", zap.Float64("temp", t))
-		service.Valve{IP: cfg.Valve}.RWPulse(ctx, cfg.PulseWidth)
+		service.Valve{Addr: cfg.ValveConfig.Addr}.RWPulse(ctx, cfg.PulseWidth)
 	}
 }
