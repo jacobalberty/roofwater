@@ -31,7 +31,10 @@ type ValveConfig struct {
 }
 
 type MQTTConfig struct {
-	URL  string `envconfig:"URL" desc:"MQTT Broker URL"`
-	User string `envconfig:"USER" desc:"MQTT username"`
-	Pass string `envconfig:"PASS" desc:"MQTT password"`
+	URL               string        `envconfig:"URL" desc:"MQTT Broker URL"`
+	User              string        `envconfig:"USER" desc:"MQTT username"`
+	Pass              string        `envconfig:"PASS" desc:"MQTT password"`
+	KeepAlive         uint16        `envconfig:"KEEPALIVE" default:"5" desc:"MQTT keepalive in seconds"`
+	ConnectRetryDelay time.Duration `envconfig:"CONNECT_RETRY_DELAY" default:"10s" desc:"MQTT connect retry delay"`
+	Timeout           time.Duration `envconfig:"TIMEOUT" default:"10s" desc:"MQTT timeout"`
 }

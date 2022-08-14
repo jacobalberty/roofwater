@@ -49,11 +49,14 @@ type Client struct {
 }
 
 type MQTTConfig struct {
-	BrokerUrl string
-	Topic     string
-	Username  string
-	Password  []byte
-	ClientID  string
+	BrokerUrl         string
+	Topic             string
+	Username          string
+	Password          []byte
+	ClientID          string
+	KeepAlive         uint16
+	ConnectRetryDelay time.Duration
+	Timeout           time.Duration
 }
 
 func (t *Client) init(ctx context.Context) error {
@@ -67,7 +70,10 @@ func (t *Client) init(ctx context.Context) error {
 			return err
 		}
 		cliCfg := autopaho.ClientConfig{
-			BrokerUrls: []*url.URL{u},
+			BrokerUrls:        []*url.URL{u},
+			KeepAlive:         t.MQTTConfig.KeepAlive,
+			ConnectRetryDelay: t.MQTTConfig.ConnectRetryDelay,
+			ConnectTimeout:    t.MQTTConfig.Timeout,
 			ClientConfig: paho.ClientConfig{
 				ClientID: t.MQTTConfig.ClientID,
 			},

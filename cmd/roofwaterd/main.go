@@ -81,12 +81,14 @@ func main() {
 		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 		go func() {
-			var ()
+			var (
+				r = RoofD{}
+			)
 			utils.Logger.Info("Roof water loop successfully started")
 
 			for {
 				func() {
-					checkWeatherAndCool(ctx, w, cfg)
+					r.CheckWeatherAndCool(ctx, w, cfg)
 					time.Sleep(cfg.PulseInterval + cfg.PulseWidth)
 				}()
 			}
@@ -95,11 +97,15 @@ func main() {
 		<-c
 		utils.Logger.Info("Received interrupt, exiting")
 	} else {
-		checkWeatherAndCool(context.Background(), w, cfg)
+		(&RoofD{}).CheckWeatherAndCool(context.Background(), w, cfg)
 	}
 }
 
-func checkWeatherAndCool(ctx context.Context, w *service.ExpiringWeather, cfg service.Config) {
+type RoofD struct {
+	valve *service.Valve
+}
+
+func (r *RoofD) CheckWeatherAndCool(ctx context.Context, w *service.ExpiringWeather, cfg service.Config) {
 	var (
 		err error
 		t   float64
@@ -113,16 +119,15 @@ func checkWeatherAndCool(ctx context.Context, w *service.ExpiringWeather, cfg se
 		utils.Logger.Ctx(ctx).Error("Failed to get weather", zap.Error(err))
 	}
 	if t > cfg.MinTemp {
-		var valve service.Valve
 		if cfg.MQTTConfig.URL != "" {
-			valve = service.Valve{
+			r.valve = &service.Valve{
 				Addr:       cfg.ValveConfig.Topic,
 				MQTTConfig: &cfg.MQTTConfig,
 			}
 		} else {
-			valve = service.Valve{Addr: cfg.ValveConfig.Addr}
+			r.valve = &service.Valve{Addr: cfg.ValveConfig.Addr}
 		}
 		utils.Logger.Ctx(ctx).Info("Temperature is too high", zap.Float64("temp", t))
-		valve.RWPulse(ctx, cfg.PulseWidth)
+		r.valve.RWPulse(ctx, cfg.PulseWidth)
 	}
 }
