@@ -30,7 +30,7 @@ func (e *ExpiringWeather) CurrentTempByZip(ctx context.Context) (float64, error)
 		)
 		e.lastUpdate = time.Now()
 	}
-	return e.w.Main.FeelsLike, err
+	return e.w.Main.Temp, err
 }
 
 func NewExpiringWeather(cfg Config) (*ExpiringWeather, error) {
