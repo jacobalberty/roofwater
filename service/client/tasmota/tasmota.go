@@ -84,13 +84,13 @@ func (t *Client) init(ctx context.Context) error {
 	return err
 }
 
-func (t Client) Command() Command {
+func (t *Client) Command() Command {
 	return Command{
 		Client: t,
 	}
 }
 
-func (t Client) Execute(ctx context.Context, c Command) error {
+func (t *Client) Execute(ctx context.Context, c Command) error {
 	var (
 		cmd string
 		err error
@@ -191,7 +191,7 @@ func (t Client) Build(c Command) (string, error) {
 }
 
 type Command struct {
-	Client
+	*Client
 	commands [][]string
 }
 

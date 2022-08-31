@@ -25,13 +25,15 @@ func (r *RoofD) CheckWeatherAndCool(ctx context.Context, w *ExpiringWeather, cfg
 		utils.Logger.Ctx(ctx).Error("Failed to get weather", zap.Error(err))
 	}
 	if t > cfg.MinTemp {
-		if cfg.MQTTConfig.URL != "" {
-			r.valve = &Valve{
-				Addr:       cfg.ValveConfig.Topic,
-				MQTTConfig: &cfg.MQTTConfig,
+		if r.valve == nil {
+			if cfg.MQTTConfig.URL != "" {
+				r.valve = &Valve{
+					Addr:       cfg.ValveConfig.Topic,
+					MQTTConfig: &cfg.MQTTConfig,
+				}
+			} else {
+				r.valve = &Valve{Addr: cfg.ValveConfig.Addr}
 			}
-		} else {
-			r.valve = &Valve{Addr: cfg.ValveConfig.Addr}
 		}
 		utils.Logger.Ctx(ctx).Info("Temperature is too high", zap.Float64("temp", t))
 		r.valve.RWPulse(ctx, cfg.PulseWidth)
