@@ -7,11 +7,11 @@ require (
 	github.com/eclipse/paho.golang v0.10.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.16
-	go.opentelemetry.io/otel v1.9.0
+	go.opentelemetry.io/otel v1.10.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.9.0
-	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.9.0
-	go.opentelemetry.io/otel/sdk v1.9.0
-	go.opentelemetry.io/otel/trace v1.9.0
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.10.0
+	go.opentelemetry.io/otel/sdk v1.10.0
+	go.opentelemetry.io/otel/trace v1.10.0
 	go.uber.org/zap v1.23.0
 )
 
