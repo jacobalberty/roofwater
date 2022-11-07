@@ -51,7 +51,11 @@ func (v *Valve) RWPulse(ctx context.Context, d time.Duration) {
 
 	v.init()
 
-	tCommand := v.tClient.Command().Power(tasmota.PowerOn).Delay(d).Power(tasmota.PowerOff)
+	tCommand := v.tClient.
+		Command().
+		Power(tasmota.PowerOn).
+		Delay(d).
+		Power(tasmota.PowerOff)
 	err := tCommand.Execute(ctx, tCommand)
 	if err != nil {
 		span.SetStatus(codes.Error, "RWPulse failed")
