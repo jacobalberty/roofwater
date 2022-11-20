@@ -6,7 +6,7 @@ require (
 	github.com/briandowns/openweathermap v0.19.0
 	github.com/eclipse/paho.golang v0.10.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.16
+	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.17
 	go.opentelemetry.io/otel v1.11.1
 	go.opentelemetry.io/otel/exporters/jaeger v1.11.1
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.11.1
@@ -20,7 +20,7 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.16 // indirect
+	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.17 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/goleak v1.1.12 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
