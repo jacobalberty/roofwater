@@ -7,13 +7,14 @@ import (
 )
 
 type Config struct {
-	PulseWidth    time.Duration      `envconfig:"PULSEWIDTH" default:"15s" desc:"Duration of the time to turn valve on"`
+	PulseWidth    float64            `envconfig:"PULSEWIDTH" default:"0.05" desc:"Duration of the time to turn valve on"`
 	PulseInterval time.Duration      `envconfig:"PULSEINTERVAL" default:"5m" desc:"Interval between pulses"`
 	MinTemp       float64            `envconfig:"MINTEMP" default:"90" desc:"Minimum temperature to run the valve"`
 	Weather       WeatherConfig      `envconfig:"OWM" required:"true" desc:"OpenWeatherMap configuration"`
 	Tracing       utils.TracerConfig `envconfig:"TRACING" required:"true" desc:"Tracing configuration"`
 	ValveConfig   ValveConfig        `envconfig:"VALVE" required:"true" desc:"Valve configuration"`
 	MQTTConfig    MQTTConfig         `envconfig:"MQTT" required:"true" desc:"MQTT configuration"`
+	PIDConfig     PIDConfig          `envconfig:"PID" required:"true" desc:"PID configuration"`
 }
 
 type WeatherConfig struct {
@@ -28,6 +29,12 @@ type WeatherConfig struct {
 type ValveConfig struct {
 	Addr  string `envconfig:"HTTP_ADDR" desc:"HTTP Address of the valve"`
 	Topic string `envconfig:"MQTT_TOPIC" desc:"MQTT topic to publish to"`
+}
+
+type PIDConfig struct {
+	Kp float64 `envconfig:"KP" default:"1.0" desc:"Proportional gain"`
+	Ki float64 `envconfig:"KI" default:"0.0" desc:"Integral gain"`
+	Kd float64 `envconfig:"KD" default:"0.0" desc:"Derivative gain"`
 }
 
 type MQTTConfig struct {

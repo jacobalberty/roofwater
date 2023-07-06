@@ -41,13 +41,20 @@ func (v *Valve) init() {
 	}
 }
 
-func (v *Valve) RWPulse(ctx context.Context, d time.Duration) {
+func (v *Valve) RWPulse(ctx context.Context, p float64, d time.Duration) {
 	ctx, span := utils.Tracer.Start(ctx, "RWPulse")
 	defer span.End()
+	period := time.Duration(float64(d) * p)
 	utils.Logger.Ctx(ctx).Info("Pulsing valve",
 		zap.String("addr", v.Addr),
-		zap.Duration("duration", d),
+		zap.Duration("interval", d),
+		zap.Duration("period", period),
+		zap.Float64("percent", p),
 	)
+
+	if p > 1.0 {
+		period = d
+	}
 
 	v.init()
 
@@ -62,7 +69,9 @@ func (v *Valve) RWPulse(ctx context.Context, d time.Duration) {
 		span.RecordError(err)
 		utils.Logger.Ctx(ctx).Error("Failed to pulse valve",
 			zap.String("addr", v.Addr),
-			zap.Duration("duration", d),
+			zap.Duration("interval", d),
+			zap.Duration("period", period),
+			zap.Float64("percent", p),
 			zap.Error(err),
 		)
 	}
