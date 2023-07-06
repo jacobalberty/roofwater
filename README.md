@@ -9,8 +9,8 @@ This application is configured via the environment. The following environment
 variables can be used:
 
 KEY                        TYPE        DEFAULT       REQUIRED    DESCRIPTION
-RW_PULSEWIDTH              Duration    15s                       Duration of the time to turn valve on
-RW_PULSEINTERVAL           Duration    5m                        Interval between pulses
+RW_PULSEWIDTH              Float       0.05                      Percent of the Interval expressed as a decimal to turn valve on
+RW_PULSEPERIOD             Duration    5m                        Period of pulses
 RW_MINTEMP                 Float       90                        Minimum temperature to run the valve
 RW_OWM_API_KEY             String                    true        OpenWeatherMap API key
 RW_OWM_ZIP                 String                    true        Zip code to get weather for

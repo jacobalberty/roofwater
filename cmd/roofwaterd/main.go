@@ -66,7 +66,7 @@ func main() {
 		utils.Logger.Fatal("Invalid OpenWeatherMap API key", zap.Error(err))
 	}
 
-	utils.Logger.Info("Pulse interval", zap.Duration("duration", cfg.PulseInterval))
+	utils.Logger.Info("Pulse period", zap.Duration("period", cfg.PulsePeriod))
 
 	w, err = service.NewExpiringWeather(cfg)
 	if err != nil {
@@ -89,7 +89,7 @@ func main() {
 			for {
 				func() {
 					r.CheckWeatherAndCool(ctx, w, cfg)
-					time.Sleep(cfg.PulseInterval)
+					time.Sleep(cfg.PulsePeriod)
 				}()
 			}
 		}()

@@ -36,6 +36,7 @@ func (r *RoofD) CheckWeatherAndCool(ctx context.Context, w *ExpiringWeather, cfg
 			}
 		}
 		utils.Logger.Ctx(ctx).Info("Temperature is too high", zap.Float64("temp", t))
-		r.valve.RWPulse(ctx, cfg.PulseWidth, cfg.PulseInterval)
+
+		r.valve.RWPulse(ctx, cfg.PulseWidth, cfg.PulsePeriod)
 	}
 }
