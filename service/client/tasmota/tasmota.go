@@ -11,6 +11,8 @@ import (
 
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
+	"github.com/jacobalberty/roofwater/service/utils"
+	"go.uber.org/zap"
 )
 
 const (
@@ -143,6 +145,10 @@ func (t *Client) Execute(ctx context.Context, c Command) error {
 			// 16 = Server received message but there are no subscribers
 			return ErrNoSubscribers
 		}
+		utils.Logger.Ctx(ctx).Debug("Published MQTT message",
+			zap.String("topic", t.MQTTConfig.Topic),
+			zap.String("cmd", cmd),
+		)
 
 		return err
 	case ClientTypeTest:
