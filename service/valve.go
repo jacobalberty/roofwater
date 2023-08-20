@@ -61,7 +61,7 @@ func (v *Valve) RWPulse(ctx context.Context, p float64, d time.Duration) {
 	tCommand := v.tClient.
 		Command().
 		Power(tasmota.PowerOn).
-		Delay(d).
+		Delay(period).
 		Power(tasmota.PowerOff)
 	err := tCommand.Execute(ctx, tCommand)
 	if err != nil {
