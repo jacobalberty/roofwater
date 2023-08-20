@@ -145,7 +145,7 @@ func (t *Client) Execute(ctx context.Context, c Command) error {
 			// 16 = Server received message but there are no subscribers
 			return ErrNoSubscribers
 		}
-		utils.Logger.Ctx(ctx).Debug("Published MQTT message",
+		utils.Logger.Ctx(ctx).Info("Published MQTT message",
 			zap.String("topic", t.MQTTConfig.Topic),
 			zap.String("cmd", cmd),
 		)
