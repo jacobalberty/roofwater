@@ -134,6 +134,10 @@ func (t *Client) Execute(ctx context.Context, c Command) error {
 			payload = c.commands[0][1]
 		}
 
+		utils.Logger.Ctx(ctx).Info("Published MQTT message",
+			zap.String("topic", t.MQTTConfig.Topic),
+			zap.String("cmd", cmd),
+		)
 		pr, err = t.cm.Publish(ctx, &paho.Publish{
 			QoS:     2,
 			Topic:   fmt.Sprintf("cmnd/%s/%s", t.MQTTConfig.Topic, cmd),
@@ -145,10 +149,6 @@ func (t *Client) Execute(ctx context.Context, c Command) error {
 			// 16 = Server received message but there are no subscribers
 			return ErrNoSubscribers
 		}
-		utils.Logger.Ctx(ctx).Info("Published MQTT message",
-			zap.String("topic", t.MQTTConfig.Topic),
-			zap.String("cmd", cmd),
-		)
 
 		return err
 	case ClientTypeTest:
