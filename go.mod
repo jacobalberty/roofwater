@@ -1,6 +1,6 @@
 module github.com/jacobalberty/roofwater
 
-go 1.21
+go 1.22
 
 require (
 	github.com/briandowns/openweathermap v0.19.0
