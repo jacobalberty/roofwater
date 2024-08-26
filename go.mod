@@ -8,7 +8,6 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/uptrace/opentelemetry-go-extra/otelzap v0.3.1
 	go.opentelemetry.io/otel v1.29.0
-	go.opentelemetry.io/otel/exporters/jaeger v1.17.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.29.0
 	go.opentelemetry.io/otel/sdk v1.29.0
 	go.opentelemetry.io/otel/trace v1.29.0
