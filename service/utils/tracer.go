@@ -8,7 +8,6 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -33,8 +32,6 @@ func InitializeTracer(ctx context.Context, tc TracerConfig) func() {
 }
 func newExporter(ctx context.Context, tc TracerConfig) (sdktrace.SpanExporter, error) {
 	switch {
-	case os.Getenv("OTEL_EXPORTER_JAEGER_ENDPOINT") != "":
-		return jaeger.New(jaeger.WithCollectorEndpoint())
 	case os.Getenv("OTEL_EXPORTER_DISCARD_ENABLED") != "":
 		return stdouttrace.New(stdouttrace.WithWriter(io.Discard))
 	default:

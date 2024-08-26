@@ -76,11 +76,12 @@ func (t *Client) init(ctx context.Context) error {
 			KeepAlive:         t.MQTTConfig.KeepAlive,
 			ConnectRetryDelay: t.MQTTConfig.ConnectRetryDelay,
 			ConnectTimeout:    t.MQTTConfig.Timeout,
+			ConnectUsername:   t.MQTTConfig.Username,
+			ConnectPassword:   t.MQTTConfig.Password,
 			ClientConfig: paho.ClientConfig{
 				ClientID: t.MQTTConfig.ClientID,
 			},
 		}
-		cliCfg.SetUsernamePassword(t.MQTTConfig.Username, t.MQTTConfig.Password)
 		t.cm, err = autopaho.NewConnection(ctx, cliCfg)
 	}
 	return err
