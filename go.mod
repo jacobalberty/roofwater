@@ -3,7 +3,7 @@ module github.com/jacobalberty/roofwater
 go 1.23
 
 require (
-	github.com/briandowns/openweathermap v0.19.0
+	github.com/briandowns/openweathermap v0.20.0
 	github.com/eclipse/paho.golang v0.21.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/uptrace/opentelemetry-go-extra/otelzap v0.3.1
